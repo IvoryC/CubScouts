@@ -22,6 +22,13 @@ a.card:hover{border-color:var(--strap);border-left-color:var(--gold)}
 a.card:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .t{font-family:Bitter,Georgia,serif;font-size:20px;display:block}
 .d{color:var(--muted);font-size:15px}
+h2{font-family:Bitter,Georgia,serif;font-size:22px;margin:32px 0 12px}
+h2:first-of-type{margin-top:0}
+ul.tiles{grid-template-columns:repeat(3,1fr)}
+a.tile{display:flex;flex-direction:column;justify-content:center;aspect-ratio:1;border-left-width:1px;border-top:6px solid var(--gold);border-radius:0 0 10px 10px;text-align:center}
+a.tile:hover{border-top-color:var(--gold)}
+a.tile .t{font-size:clamp(15px,3.6vw,20px);overflow-wrap:anywhere}
+@media (max-width:420px){ul.tiles{grid-template-columns:1fr}a.tile{aspect-ratio:auto}}
 footer{color:var(--muted);font-size:13px;margin-top:36px}
 </style>
 </head>
@@ -30,8 +37,25 @@ footer{color:var(--muted);font-size:13px;margin-top:36px}
 <main class="wrap">
   <h1>Cub Scout pack resources</h1>
   <p class="lede">Planning tools for den leaders and families, Lion through Arrow of Light.</p>
+  <h2>General Planning Resources</h2>
   <ul>
     <li><a class="card" href="adventure-crosswalk/"><span class="t">Adventure crosswalk</span><span class="d">See every required adventure and the bicycling elective side by side across all six ranks, with shared and unique requirements color-coded.</span></a></li>
+  </ul>
+
+  <h2>Pack 238 Resources</h2>
+  <ul>
+    <li><a class="card" href="https://www.pack238.org" target="_blank" rel="noopener"><span class="t">Pack 238 website</span><span class="d">Meeting times and location, the online application and the interest survey.</span></a></li>
+  </ul>
+
+  <h2>Scouting America Resources</h2>
+  <ul class="tiles">
+    <li><a class="card tile" href="https://beascout.org" target="_blank" rel="noopener"><span class="t">BeAScout</span><span class="d">Find a unit and join</span></a></li>
+    <li><a class="card tile" href="https://my.scouting.org" target="_blank" rel="noopener"><span class="t">My.Scouting</span><span class="d">Registration, training and unit tools</span></a></li>
+    <li><a class="card tile" href="https://scoutbook.scouting.org" target="_blank" rel="noopener"><span class="t">Scoutbook</span><span class="d">Advancement tracking</span></a></li>
+  </ul>
+  <ul style="margin-top:12px">
+    <li><a class="card" href="https://michiganscouting.org/cub-scout-leader-resources/" target="_blank" rel="noopener"><span class="t">Michigan Crossroads Council: Cub Scout leader resources</span><span class="d">Year and four-month planning tools, den advancement charts, rank requirements and handbooks, Pinewood Derby rules, ceremonies and pack forms.</span></a></li>
+    <li><a class="card" href="https://www.scouting.org/programs/cub-scouts/adventures/" target="_blank" rel="noopener"><span class="t">Cub Scout adventures on scouting.org</span><span class="d">The official adventure lists for Lion, Tiger, Wolf, Bear, Webelos and Arrow of Light.</span></a></li>
   </ul>
   <footer>Requirements follow the Cub Scout program in effect since June 2024. Check the rank handbook or scouting.org for official wording.</footer>
 </main>
