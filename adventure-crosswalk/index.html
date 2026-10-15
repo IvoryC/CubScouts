@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cub Scout adventure crosswalk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#F3F5F1; --panel:#FFFFFF; --ink:#16233A; --muted:#55627A; --line:#D9DED6;
+  --strap:#1B3F73; --strap-ink:#F7F3E4; --gold:#E8A317; --gold-ink:#5A3B00;
+  --all-bg:#DDEFD9; --all-ink:#1E5A2B; --sh-bg:#DCE7F7; --sh-ink:#1B3F73; --un-bg:#FBEBC6; --un-ink:#6B4500;
+  --focus:#E8A317;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0F1726; --panel:#16213A; --ink:#EEF1F6; --muted:#A8B3C7; --line:#2A3654;
+    --strap:#0A2448; --strap-ink:#F7F3E4; --gold:#F0B437; --gold-ink:#2B1C00;
+    --all-bg:#1F4A2A; --all-ink:#CDEBD1; --sh-bg:#1F3866; --sh-ink:#D3E1F7; --un-bg:#5A3E07; --un-ink:#FBE3A6;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0F1726; --panel:#16213A; --ink:#EEF1F6; --muted:#A8B3C7; --line:#2A3654;
+  --strap:#0A2448; --strap-ink:#F7F3E4; --gold:#F0B437; --gold-ink:#2B1C00;
+  --all-bg:#1F4A2A; --all-ink:#CDEBD1; --sh-bg:#1F3866; --sh-ink:#D3E1F7; --un-bg:#5A3E07; --un-ink:#FBE3A6;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--strap)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{padding:40px 0 22px}
+h1{font-family:Bitter,Georgia,serif;font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.1;margin:0 0 10px;letter-spacing:-0.01em}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.strap{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--strap);border-top:3px solid var(--gold);border-bottom:3px solid var(--gold)}
+.loops{display:flex;gap:8px;overflow-x:auto;padding:10px 20px;max-width:1040px;margin:0 auto;scrollbar-width:thin}
+.loop{flex:0 0 auto;font:inherit;font-size:15px;color:var(--strap-ink);background:transparent;border:2px solid rgba(247,243,228,.35);border-radius:999px;padding:7px 16px;cursor:pointer;white-space:nowrap}
+.loop:hover{border-color:var(--strap-ink)}
+.loop[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:var(--gold-ink);font-weight:700}
+.loop .kind{font-size:12px;opacity:.8;margin-left:6px}
+button:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+main{padding:28px 0 48px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 22px 26px}
+.ph{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:6px}
+h2{font-family:Bitter,Georgia,serif;font-weight:700;font-size:26px;margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:15px}
+.btn{font:inherit;font-size:15px;background:var(--panel);color:var(--ink);border:1.5px solid var(--strap);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn:hover{background:var(--sh-bg)}
+.cap{background:var(--panel);padding:14px 2px 6px}
+.cap-title{display:none;font-family:Bitter,Georgia,serif;font-weight:700;font-size:20px;margin:0 0 8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:0 0 12px}
+.c{display:inline-block;min-width:28px;padding:2px 7px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;line-height:1.5}
+.al{background:var(--all-bg);color:var(--all-ink)}
+.sh{background:var(--sh-bg);color:var(--sh-ink)}
+.un{background:var(--un-bg);color:var(--un-ink)}
+.scroll{overflow-x:auto}
+table{width:100%;min-width:720px;border-collapse:collapse;table-layout:fixed;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 4px;text-align:center;vertical-align:middle}
+thead th{font-weight:700;font-size:13px;vertical-align:bottom;line-height:1.3}
+thead th .adv{display:block;font-weight:400;color:var(--muted);font-size:12px}
+th.sk,td.sk{text-align:left;padding-left:0}
+td.sk{font-size:14px}
+.foot{font-size:13px;color:var(--muted);margin:10px 0 0}
+.compare{margin-top:30px;padding-top:22px;border-top:2px dashed var(--line)}
+.compare h3{font-family:Bitter,Georgia,serif;font-size:20px;margin:0 0 10px}
+.pick{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px;font-size:15px}
+select{font:inherit;font-size:15px;color:var(--ink);background:var(--panel);border:1.5px solid var(--line);border-radius:8px;padding:6px 10px}
+.ov{font-weight:700}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.col{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.col h4{margin:0 0 6px;font-size:15px}
+.col ul{margin:0;padding-left:18px;font-size:14px}
+.col li{margin:3px 0}
+.note{color:var(--muted)}
+.shot{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:12px}
+.shot img{max-width:100%;height:auto;display:block;margin-top:8px;border:1px solid var(--line)}
+.status{font-size:14px;color:var(--muted);min-height:1.4em;margin:8px 0 0}
+footer{color:var(--muted);font-size:13px;padding:0 0 36px}
+footer a{color:inherit}
+@media (max-width:560px){.panel{padding:16px 14px 20px}h2{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <h1>Cub Scout adventure crosswalk</h1>
+  <p class="lede">Each tab lines up one adventure theme across all six ranks, Lion through Arrow of Light, so you can see what dens share and what's unique. Handy for planning combined den meetings.</p>
+</header>
+<nav class="strap" aria-label="Adventure themes"><div class="loops" role="tablist" id="tabs"></div></nav>
+<main class="wrap">
+  <section class="panel" role="tabpanel" id="panel" aria-live="polite">
+    <div class="ph">
+      <div><h2 id="title"></h2><p class="sub" id="sub"></p></div>
+      <button class="btn" id="copy" type="button">Copy chart as image</button>
+    </div>
+    <div class="cap" id="cap">
+      <p class="cap-title" id="capTitle"></p>
+      <div class="legend">
+        <span><span class="c al">#</span> every rank</span>
+        <span><span class="c sh">#</span> shared with another rank</span>
+        <span><span class="c un">#</span> unique to one rank</span>
+        <span>Numbers are requirement numbers. Hover or tap a cell for details.</span>
+      </div>
+      <div class="scroll"><table><colgroup><col style="width:32%"><col><col><col><col><col><col></colgroup>
+        <thead><tr id="head"></tr></thead><tbody id="body"></tbody></table></div>
+      <p class="foot" id="foot"></p>
+    </div>
+    <p class="status" id="status" role="status"></p>
+    <div id="shotBox"></div>
+    <div class="compare">
+      <h3>Compare two ranks</h3>
+      <div class="pick"><select id="a" aria-label="First rank"></select><span>with</span><select id="b" aria-label="Second rank"></select><span class="ov" id="ov"></span></div>
+      <div class="cols">
+        <div class="col"><h4 id="hb"></h4><ul id="lb"></ul></div>
+        <div class="col"><h4 id="ha"></h4><ul id="la"></ul></div>
+        <div class="col"><h4 id="hc"></h4><ul id="lc"></ul></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer class="wrap">Requirements follow the Cub Scout program in effect since June 2024. Wording is condensed; check the rank handbook or <a href="https://www.scouting.org/programs/cub-scouts/adventures/">scouting.org</a> for the official text.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const R=['L','T','W','B','We','A'];
+const N={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'Arrow of Light'};
+const NS={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'AOL'};
+const THEMES=[
+{id:'bicycling',name:'Bicycling',kind:'Elective',
+ adv:{L:'On a Roll',T:'Rolling Tigers',W:'Pedal with the Pack',B:'Bears on Bikes',We:'Pedal Away',A:'Cycling'},
+ rows:[
+ ['Learn about safety gear',{L:['1','With den or adult partner'],T:['2','With den or adult partner']}],
+ ['Learn bike safety rules',{L:['2','With den or adult partner'],T:['3','With den or adult partner']}],
+ ['Wear a helmet properly',{W:['1','Also take it off and put it on without help'],B:['1','Show proper fit']}],
+ ['Decide what to wear riding',{W:['2',''],B:['2','']}],
+ ['Demonstrate hand signals',{T:['4','With den or adult partner'],W:['5',''],B:['3','']}],
+ ['ABCs of bike gear (air, brakes, chain)',{T:['1','']}],
+ ['Types of bikes and where to ride them',{W:['3','']}],
+ ['Start and stop without help',{W:['4','']}],
+ ['Adjust saddle height',{B:['4','']}],
+ ['Operate brakes',{B:['5','']}],
+ ['Use a pump; why low tires are unsafe',{B:['6','']}],
+ ['Long-ride gear and how to carry it',{We:['1',''],A:['1','']}],
+ ['How multi-gear bikes work',{We:['2',''],A:['2','']}],
+ ['Lubricate a chain',{We:['3','Practice'],A:['3','Show how']}],
+ ['Bike locks',{We:['4','Pick one; lock, unlock, secure, and carry it'],A:['4','Lock, unlock, secure, and carry it']}],
+ ['Repair a flat tire',{A:['5','']}],
+ ['Plan a ride with a map',{We:['5','At least 5 miles'],A:['6','At least 10 miles']}],
+ ['Go on a ride',{L:['3','With adult partner or family'],T:['5','Ride, or begin learning to ride'],W:['6','Buddy system, den/pack/family'],B:['7','Buddy system, 30 minutes'],We:['6','Buddy system, 5+ miles'],A:['7','Buddy system, 10+ miles']}]
+ ],foot:'Scouts pick two electives per rank; bicycling is one option.'},
+{id:'bobcat',name:'Bobcat',kind:'Required',
+ adv:{L:'Bobcat',T:'Bobcat',W:'Bobcat',B:'Bobcat',We:'Bobcat',A:'Bobcat'},
+ rows:[
+ ['Get to know your den or patrol',{L:['1',''],T:['1',''],W:['1',''],B:['1',''],We:['1',''],A:['2','Patrol']}],
+ ['Have the Scout Law read to you',{L:['2','Show being friendly'],T:['3','Show being trustworthy, helpful, or friendly']}],
+ ['Recite the Scout Oath (and Law)',{T:['2','Oath only'],W:['2','Oath and Law'],B:['2','Oath and Law'],We:['2','Oath and Law'],A:['3','Oath and Law, with patrol']}],
+ ['Learn about the Scout Oath (three points)',{W:['3','']}],
+ ['Learn about the Scout Law',{B:['3',''],We:['3','']}],
+ ['Create a den or patrol Code of Conduct',{W:['4',''],B:['4',''],We:['4',''],A:['4','Patrol']}],
+ ['Learn the denner role',{W:['5','']}],
+ ['Sign, salute, and handshake',{T:['4','Cub Scout'],W:['6','Cub Scout'],B:['5','Cub Scout'],We:['5','Cub Scout'],A:['5','Scouts BSA versions']}],
+ ['Share a time you did your best',{L:['3',''],T:['5',''],W:['7','Also explain why it matters'],B:['6',''],We:['6','']}],
+ ['Patrol method: name and patrol leader',{A:['1','']}],
+ ['Learn the Scouts BSA slogan and motto',{A:['6','']}],
+ ['Visit a Scouts BSA troop',{A:['7','']}],
+ ['Protecting children booklet at home',{L:['4',''],T:['6',''],W:['8',''],B:['7',''],We:['7',''],A:['8','']}]
+ ],foot:'Bobcat is designed to be the first adventure each year.'},
+{id:'citizenship',name:'Citizenship',kind:'Required',
+ adv:{L:'King of the Jungle',T:'Team Tiger',W:'Council Fire',B:'Paws for Action',We:'My Community',A:'Citizenship'},
+ rows:[
+ ['Draw the people you live with',{L:['1','']}],
+ ['Choose and do a helpful job',{L:['2','For your family'],T:['2','For your team']}],
+ ['Talk with an older adult about citizenship',{L:['3','']}],
+ ['Rules and teamwork through games',{T:['1, 3','A game with rules; a two-team game']}],
+ ['U.S. flag care, folding, and ceremony',{W:['1','Fold the flag; join a flag ceremony'],B:['1','History, raising, lowering, folding, etiquette']}],
+ ['Scout Law and being a good neighbor',{W:['2','']}],
+ ['Build model home and neighborhood',{W:['3–5','']}],
+ ['U.S. symbols craft',{B:['2','']}],
+ ['Learn about a nonprofit',{B:['3','Mission, funding, volunteers']}],
+ ['Voting types and an elected official',{We:['1–2','Majority vs. plurality; interview an official']}],
+ ['Federal law timeline and three branches',{We:['3','']}],
+ ['Plan a service project with the SAFE Checklist',{A:['1','']}],
+ ['Participate in a service project',{L:['4',''],T:['4',''],W:['6','Explain how it helps your neighborhood'],B:['4',''],We:['4',''],A:['2','At least 2 hours total']}]
+ ],foot:''},
+{id:'family',name:'Family and reverence',kind:'Required',
+ adv:{L:"Lion's Pride",T:'Tiger Circles',W:'Footsteps',B:'Fellowship',We:'My Family',A:'Duty to God'},
+ rows:[
+ ['Talk about family faith traditions',{L:['1','Draw a favorite holiday'],T:['1','Name 3 holidays; draw one'],W:['1','Name 3; craft, art, or food'],B:['1','Name 3; craft, art, or food'],We:['1','Name 3; craft or art'],A:['1','Name 3; craft, art, or food']}],
+ ['Attend a service or reverence gathering',{L:['2',''],T:['2',''],W:['2',''],B:['2',''],We:['2','']}],
+ ['Make a cheerful card for someone you love',{L:['3','']}],
+ ['Carry out an act of kindness',{T:['3',''],W:['3',''],B:['3',''],We:['3',''],A:['2','']}],
+ ['Compare a different faith with your own',{W:['4','Two things in common'],B:['4','Two things in common'],A:['3','Two things in common']}],
+ ['Discuss truthfulness (The Boy Who Cried Wolf)',{We:['4','']}],
+ ['Discuss what it means to be reverent',{A:['4','']}]
+ ],foot:'Every rank can earn this adventure through a religious emblem instead of these requirements.'},
+{id:'outdoors',name:'Outdoors',kind:'Required',
+ adv:{L:'Mountain Lion',T:'Tigers in the Wild',W:'Paws on the Path',B:'Bear Habitat',We:'Webelos Walkabout',A:'Outdoor Adventurer'},
+ rows:[
+ ['Six Essentials (Scout Basic Essentials for AOL)',{L:['1',''],T:['1',''],W:['1',''],B:['1','Gather for the walk'],We:['1','Gather for the walk'],A:['1','Scout Basic Essentials']}],
+ ['Weather-appropriate clothes and shoes',{W:['3',''],B:['1',''],We:['1','']}],
+ ['Learn the buddy system',{W:['2','']}],
+ ['Outdoor Code and Leave No Trace',{T:['2','Outdoor Code'],W:['4',''],B:['3–9','One principle at a time, then practice on the walk'],We:['6','Practice on the walk'],A:['8','Discuss after the campout']}],
+ ['Natural vs. man-made things',{L:['2',''],T:['3','']}],
+ ['Animals, domestic and wild',{L:['4',''],T:['4','Also draw a favorite'],W:['6','Describe four'],B:['7','Spot six signs of wildlife']}],
+ ['Describe what S.A.W. means',{L:['3','']}],
+ ['Find a helpful tree',{T:['5','']}],
+ ['Use a map for the route or campsite',{B:['2','Confirm 1-mile route'],We:['2','Plan 2-mile route'],A:['4','Locate the campsite']}],
+ ['Check the weather forecast',{We:['3','']}],
+ ['Apply the SAFE Checklist',{We:['4',''],A:['3','']}],
+ ['First aid for trail problems',{We:['5','Blister, sprain, sunburn, heat illness']}],
+ ['Overnight gear and how to carry it',{A:['2','']}],
+ ['Set up a campsite with your patrol',{A:['6','']}],
+ ['Keep food safe at camp',{A:['7','']}],
+ ['Go outside: walk or campout',{L:['2','20-minute walk'],T:['3','20-minute walk'],W:['5','30-minute walk'],B:['9','1-mile walk'],We:['6','2-mile walk'],A:['5','Campout with patrol or troop']}],
+ ['Debrief what went well',{We:['7',''],A:['8','']}]
+ ],foot:''},
+{id:'fitness',name:'Personal fitness',kind:'Required',
+ adv:{L:'Fun on the Run',T:'Tiger Bites',W:'Running with the Pack',B:'Bear Strong',We:'Stronger, Faster, Higher',A:'Personal Fitness'},
+ rows:[
+ ['Nutrition',{L:['1','Five food groups'],T:['1','Five food groups'],W:['1','Taste three different-colored foods'],B:['1','Sample three food groups'],We:['1','Plan, cook, and eat a balanced meal'],A:['1','Plan and cook a camp meal']}],
+ ['Hygiene',{L:['2','Handwashing'],T:['2','Handwashing'],W:['2','Brushing teeth']}],
+ ['Be active with others',{L:['3','20 minutes'],T:['3','30 minutes'],W:['3','30 minutes, stretch and move'],B:['2','30 minutes, stretch and move'],We:['2','30 minutes, stretch and move'],A:['3','30 minutes, with patrol or a younger den']}],
+ ['Personal exercises',{W:['4','10 minutes'],B:['3','15 minutes'],We:['3','15 minutes']}],
+ ['Rest, sleep, and relaxation',{L:['4','Ways to rest'],T:['4','Ways to sleep'],W:['5','10-minute relaxing activity'],B:['4','10-minute relaxing activity'],We:['4','10-minute relaxing activity']}],
+ ['Review the Annual Health and Medical Record',{W:['6',''],B:['5',''],We:['5',''],A:['4','']}],
+ ['Track activity for 14 days',{A:['2','Also reflect on being physically fit']}]
+ ],foot:''},
+{id:'safety',name:'Personal safety',kind:'Required',
+ adv:{L:'Lion Roar',T:'Tiger Roar',W:'Safety in Numbers',B:'Standing Tall',We:'My Safety',A:'First Aid'},
+ rows:[
+ ['Watch the Protect Yourself Rules video',{L:['1',''],T:['1',''],W:['1',''],B:['1',''],We:['1',''],A:['1','']}],
+ ['Shout, Run, Tell',{L:['2',''],T:['2','']}],
+ ['Access emergency services',{L:['3',''],T:['3','']}],
+ ['Cross a street or parking lot safely',{L:['4','']}],
+ ['What to do if lost or separated',{T:['4','']}],
+ ['Discuss safe touch',{W:['2','']}],
+ ['Buddy system',{W:['3','']}],
+ ['Playground safety',{W:['4','']}],
+ ['Personal Space Bubble worksheet',{B:['2','']}],
+ ['Family digital device policy',{B:['3','']}],
+ ['Personal safety gear',{B:['4','Head, eyes, mouth and nose, hands, feet']}],
+ ['Household hazards and home safety',{We:['2–3','']}],
+ ['Prepare for natural events',{We:['4','At least two likely locally']}],
+ ['Respond to first aid situations',{A:['2–6','Hurry cases, choking, shock, minor injuries']}],
+ ['Build a home first aid kit',{A:['7','']}]
+ ],foot:''}
+];
+
+const $=id=>document.getElementById(id);
+const tabs=$('tabs');
+let cur=THEMES[0];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+
+THEMES.forEach(t=>{
+  const b=document.createElement('button');
+  b.className='loop';b.type='button';b.setAttribute('role','tab');b.id='tab-'+t.id;
+  b.setAttribute('aria-controls','panel');
+  b.innerHTML=esc(t.name)+(t.kind==='Elective'?'<span class="kind">elective</span>':'');
+  b.addEventListener('click',()=>{location.hash=t.id});
+  tabs.appendChild(b);
+});
+tabs.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+  const i=THEMES.indexOf(cur), j=(i+(e.key==='ArrowRight'?1:-1)+THEMES.length)%THEMES.length;
+  location.hash=THEMES[j].id; setTimeout(()=>$('tab-'+THEMES[j].id).focus(),0);
+});
+
+['a','b'].forEach(id=>R.forEach(r=>$(id).add(new Option(N[r],r))));
+$('a').value='B';$('b').value='W';
+
+function render(){
+  const t=cur;
+  THEMES.forEach(x=>{const b=$('tab-'+x.id);b.setAttribute('aria-selected',x===t);b.tabIndex=x===t?0:-1});
+  $('panel').setAttribute('aria-labelledby','tab-'+t.id);
+  $('title').textContent=t.name;
+  $('sub').textContent=t.kind+' adventures'+(t.id==='bobcat'?'':' — '+R.map(r=>t.adv[r]).join(', '));
+  $('capTitle').textContent=t.name+' ('+t.kind.toLowerCase()+') requirements by rank';
+  let h='<th class="sk" scope="col">Skill</th>';
+  R.forEach(r=>{h+='<th scope="col">'+NS[r]+(t.id==='bobcat'?'':'<span class="adv">'+esc(t.adv[r])+'</span>')+'</th>'});
+  $('head').innerHTML=h;
+  let body='';
+  t.rows.forEach(([k,m])=>{
+    const n=Object.keys(m).length, cls=n===6?'al':n>1?'sh':'un';
+    body+='<tr><td class="sk">'+esc(k)+'</td>';
+    R.forEach(r=>{
+      if(m[r]){const tip=N[r]+' req '+m[r][0]+(m[r][1]?': '+m[r][1]:'');
+        body+='<td><span class="c '+cls+'" title="'+esc(tip)+'" aria-label="'+esc(tip)+'" tabindex="0">'+esc(m[r][0])+'</span></td>';}
+      else body+='<td></td>';
+    });
+    body+='</tr>';
+  });
+  $('body').innerHTML=body;
+  $('foot').textContent=t.foot||'';
+  $('foot').style.display=t.foot?'':'none';
+  $('status').textContent='';$('shotBox').innerHTML='';
+  compare();
+}
+
+function li(k,m,rs){
+  const d=rs.filter(r=>m[r]&&m[r][1]).map(r=>NS[r]+': '+m[r][1]);
+  return '<li>'+esc(k)+(d.length?' <span class="note">('+esc(d.join('; '))+')</span>':'')+'</li>';
+}
+function compare(){
+  const x=$('a').value,y=$('b').value,t=cur;
+  let B='',A='',C='',nb=0,na=0,nc=0;
+  t.rows.forEach(([k,m])=>{
+    if(m[x]&&m[y]){B+=li(k,m,[x,y]);nb++}
+    else if(m[x]){A+=li(k,m,[x]);na++}
+    else if(m[y]){C+=li(k,m,[y]);nc++}
+  });
+  $('lb').innerHTML=B||'<li class="note">Nothing shared</li>';
+  $('la').innerHTML=A||'<li class="note">Nothing extra</li>';
+  $('lc').innerHTML=C||'<li class="note">Nothing extra</li>';
+  $('hb').textContent='Both ('+nb+')';
+  $('ha').textContent='Only '+N[x]+' ('+na+')';
+  $('hc').textContent='Only '+N[y]+' ('+nc+')';
+  $('ov').textContent=x===y?'Pick two different ranks':nb+' overlapping skills';
+}
+$('a').addEventListener('change',compare);$('b').addEventListener('change',compare);
+
+function route(){
+  const id=(location.hash||'').slice(1);
+  cur=THEMES.find(t=>t.id===id)||THEMES[0];
+  render();
+}
+window.addEventListener('hashchange',route);
+
+$('copy').addEventListener('click',async()=>{
+  const st=$('status');
+  if(typeof html2canvas!=='function'){st.textContent="The image tool didn't load. Reload the page and try again.";return}
+  st.textContent='Making the image…';
+  const bg=getComputedStyle($('cap')).backgroundColor;
+  try{
+    const canvas=await html2canvas($('cap'),{backgroundColor:bg,scale:2,windowWidth:1100,
+      onclone:doc=>{
+        const c=doc.getElementById('cap');c.style.width='900px';c.style.padding='20px';
+        doc.getElementById('capTitle').style.display='block';
+        c.querySelector('.scroll').style.overflow='visible';
+        const lg=c.querySelector('.legend span:last-child');if(lg)lg.textContent='Numbers are requirement numbers.';
+      }});
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+    let copied=false;
+    try{
+      if(navigator.clipboard&&window.ClipboardItem){
+        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);copied=true;
+      }
+    }catch(e){copied=false}
+    const url=URL.createObjectURL(blob);
+    if(copied){
+      st.textContent='Chart copied. Paste it into an email, doc, or message.';
+      $('shotBox').innerHTML='';
+    }else{
+      st.textContent="Your browser blocked direct copying, so here's the image instead.";
+      $('shotBox').innerHTML='<div class="shot"><strong>Right-click (or long-press) the image to copy or save it.</strong><img alt="'+esc(cur.name)+' requirements chart" src="'+url+'"></div>';
+    }
+  }catch(e){
+    st.textContent="Couldn't make the image. Try again, or take a screenshot of the chart.";
+  }
+});
+
+route();
+</script>
+</body>
+</html>
