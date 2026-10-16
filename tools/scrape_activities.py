@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Regenerate adventure-crosswalk/activities.js from scouting.org adventure pages.
 
-Reads the adventure slugs from the LOOPS table in adventure-crosswalk/index.html,
+Reads the adventure slugs from the LOOPS table in adventure-crosswalk/data/loops.js,
 downloads each https://www.scouting.org/cub-scout-adventures/<slug>/ page, and
 records, per requirement, the requirement text and the activity tiles listed
 under it (title, link, indoor/outdoor, energy, supplies, prep time).
@@ -13,7 +13,7 @@ so reruns don't refetch; delete the cache to pick up site changes.
 import html, json, os, re, sys, time, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INDEX = os.path.join(ROOT, 'adventure-crosswalk', 'index.html')
+LOOPS_JS = os.path.join(ROOT, 'adventure-crosswalk', 'data', 'loops.js')
 OUT = os.path.join(ROOT, 'adventure-crosswalk', 'activities.js')
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 '
       '(KHTML, like Gecko) Version/17.0 Safari/605.1.15')
@@ -24,7 +24,7 @@ os.makedirs(cache, exist_ok=True)
 
 
 def slugs():
-    src = open(INDEX).read()
+    src = open(LOOPS_JS).read()
     block = src[src.index('const LOOPS='):]
     block = block[:block.index('};') + 1]
     return sorted(set(re.findall(r'\["([a-z0-9-]+)","[^"]+\.(?:jpg|png|webp)"', block)))

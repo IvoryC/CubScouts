@@ -10,7 +10,7 @@ Planning tools for den leaders and families, published with GitHub Pages.
 | `adventure-crosswalk/` | Requirement crosswalk for the six required adventures and the bicycling elective, Lion through Arrow of Light, with a two-rank comparison and a copy-chart-as-image button |
 | `.nojekyll` | Tells GitHub Pages to serve files as-is |
 
-Each crosswalk tab has its own link, for example `adventure-crosswalk/#outdoors`. Tab IDs: `bicycling`, `bobcat`, `citizenship`, `family`, `outdoors`, `fitness`, `safety`.
+Each adventure in the crosswalk's dropdown has its own link, for example `adventure-crosswalk/#outdoors`. IDs: `bobcat`, `fitness`, `safety`, `family`, `citizenship`, `outdoors` (the six required adventures) and `bicycling` (elective).
 
 ## Publish it
 
@@ -26,7 +26,7 @@ Each crosswalk tab has its own link, for example `adventure-crosswalk/#outdoors`
 
 ## Update crosswalk requirements
 
-All requirement data lives in the `THEMES` array near the bottom of `adventure-crosswalk/index.html`. Each row is a skill and the ranks that include it:
+The crosswalk is split into `index.html` (markup), `crosswalk.css`, `crosswalk.js` (behavior) and `data/`. Requirement data lives in `adventure-crosswalk/data/themes.js`, one entry per adventure; list the six required adventures first, then electives. To add an adventure, add an entry there and a matching entry in `data/loops.js` (scouting.org page slug and belt-loop image for each rank), then rerun the scraper below. Each row is a skill and the ranks that include it:
 
 ```js
 ['Demonstrate hand signals', { T: ['4', 'note'], W: ['5', ''], B: ['3', ''] }]
@@ -34,6 +34,6 @@ All requirement data lives in the `THEMES` array near the bottom of `adventure-c
 
 Rank keys: `L` Lion, `T` Tiger, `W` Wolf, `B` Bear, `We` Webelos, `A` Arrow of Light. Cell colors (every rank, shared, unique) are calculated automatically from how many ranks a row has.
 
-Tapping a number opens the activity tiles for that requirement. Those come from `adventure-crosswalk/activities.js`, which is generated from the scouting.org adventure pages. To refresh it, run `python3 tools/scrape_activities.py` (delete `.cache/` first to refetch pages). It reads the adventure list from the `LOOPS` table in the crosswalk page.
+Tapping a number opens the activity tiles for that requirement. Those come from `adventure-crosswalk/activities.js`, which is generated from the scouting.org adventure pages. To refresh it, run `python3 tools/scrape_activities.py` (delete `.cache/` first to refetch pages). It reads the adventure list from the `LOOPS` table in `data/loops.js`.
 
 Requirement wording is condensed from the 2024 Cub Scout program. Check the rank handbooks or scouting.org for the official text.
