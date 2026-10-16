@@ -34,4 +34,6 @@ All requirement data lives in the `THEMES` array near the bottom of `adventure-c
 
 Rank keys: `L` Lion, `T` Tiger, `W` Wolf, `B` Bear, `We` Webelos, `A` Arrow of Light. Cell colors (every rank, shared, unique) are calculated automatically from how many ranks a row has.
 
+Tapping a number opens the activity tiles for that requirement. Those come from `adventure-crosswalk/activities.js`, which is generated from the scouting.org adventure pages. To refresh it, run `python3 tools/scrape_activities.py` (delete `.cache/` first to refetch pages). It reads the adventure list from the `LOOPS` table in the crosswalk page.
+
 Requirement wording is condensed from the 2024 Cub Scout program. Check the rank handbooks or scouting.org for the official text.

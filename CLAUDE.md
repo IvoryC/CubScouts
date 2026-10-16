@@ -20,4 +20,7 @@ New resources go in their own folder with an `index.html`, plus a card copied fr
 - Cell colors (every rank / shared / unique) are computed from how many ranks a row includes, so don't hand-set them.
 - Tabs are routed by URL hash (`#bicycling`, `#bobcat`, `#citizenship`, `#family`, `#outdoors`, `#fitness`, `#safety`); `route()` handles this. A new theme needs a matching tab ID.
 - Rendering is in `render()`, the two-rank comparison in `compare()`.
+- `LOOPS` maps each theme and rank to its scouting.org adventure slug and belt-loop image; it drives the header images and the cell and header links.
+- Tapping a number cell opens a detail panel (`showDetail`) built from `activities.js` (`ACTIVITIES`, keyed by adventure slug then requirement number). Don't edit that file by hand: regenerate it with `python3 tools/scrape_activities.py` (stdlib only; caches pages in git-ignored `.cache/`). scouting.org returns 403 to requests without browser-like headers; the script sends them.
+- Cell numbers must match the official requirement numbers on scouting.org, since they select the activities. `reqNums()` expands `'1, 3'` and `'3–5'`.
 - Requirement wording is condensed from the 2024 Cub Scout program; don't present it as official text.
