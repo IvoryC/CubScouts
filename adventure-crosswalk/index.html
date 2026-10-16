@@ -60,6 +60,9 @@ h2{font-family:Bitter,Georgia,serif;font-weight:700;font-size:26px;margin:0}
 .cap-title{display:none;font-family:Bitter,Georgia,serif;font-weight:700;font-size:20px;margin:0 0 8px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:0 0 12px}
 .c{display:inline-block;min-width:28px;padding:2px 7px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;line-height:1.5}
+button.rowname{font:inherit;color:inherit;background:none;border:0;padding:0;text-align:left;cursor:pointer;text-decoration:underline dotted;text-decoration-color:var(--muted);text-underline-offset:3px}
+button.rowname:hover{text-decoration-style:solid;text-decoration-color:var(--strap)}
+button.rowname[aria-expanded="true"]{font-weight:700}
 button.c{border:0;font-family:inherit;cursor:pointer;color:inherit}
 .loopimg{display:inline-block;line-height:0;border-radius:6px}
 .loopimg img{width:48px;height:auto;border-radius:6px;display:block;margin:0 auto 4px}
@@ -69,13 +72,15 @@ button.c{border:0;font-family:inherit;cursor:pointer;color:inherit}
 button.c:hover{filter:brightness(.95);transform:translateY(-1px)}
 button.c:focus-visible{outline:3px solid var(--strap);outline-offset:2px}
 button.c[aria-expanded="true"]{outline:3px solid var(--strap);outline-offset:1px;box-shadow:0 2px 0 var(--gold)}
-.detail{margin-top:18px;border:1.5px solid var(--strap);border-top:6px solid var(--gold);border-radius:0 0 12px 12px;background:var(--panel);padding:16px 18px 18px;scroll-margin-top:70px}
+.detail{position:relative;margin-top:18px;border:1.5px solid var(--strap);border-top:6px solid var(--gold);border-radius:0 0 12px 12px;background:var(--panel);padding:16px 18px 18px;scroll-margin-top:70px}
 .detail:focus{outline:none}
 .dh{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
 .dh h3{font-family:Bitter,Georgia,serif;font-size:19px;margin:0;line-height:1.25}
 .dh .meta{color:var(--muted);font-size:14px;margin:2px 0 0}
 .dh .meta a,.req-text a{color:inherit}
-.dclose{flex:0 0 auto;font:inherit;font-size:14px;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer}
+.dsec+.dsec{margin-top:20px;padding-top:16px;border-top:2px dashed var(--line)}
+.dh{padding-right:72px}
+.dclose{position:absolute;top:12px;right:12px;font:inherit;font-size:14px;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer}
 .dclose:hover{border-color:var(--strap)}
 .dloop{flex:0 0 auto;width:40px;height:auto;border-radius:5px}
 .dreq{margin-top:14px}
@@ -142,7 +147,7 @@ footer a{color:inherit}
         <span><span class="c al">#</span> every rank</span>
         <span><span class="c sh">#</span> shared with another rank</span>
         <span><span class="c un">#</span> unique to one rank</span>
-        <span>Numbers are requirement numbers. Tap one to see its activities.</span>
+        <span>Numbers are requirement numbers. Tap one to see its activities, or tap a skill to see them for every rank.</span>
       </div>
       <div class="scroll"><table><colgroup><col style="width:32%"><col><col><col><col><col><col></colgroup>
         <thead><tr id="head"></tr></thead><tbody id="body"></tbody></table></div>
@@ -370,7 +375,7 @@ function render(){
   let body='';
   t.rows.forEach(([k,m],ri)=>{
     const n=Object.keys(m).length, cls=n===6?'al':n>1?'sh':'un';
-    body+='<tr><td class="sk">'+esc(k)+'</td>';
+    body+='<tr><td class="sk"><button type="button" class="rowname" data-ri="'+ri+'" aria-expanded="false" aria-controls="detail" title="Show activities for every rank">'+esc(k)+'</button></td>';
     R.forEach(r=>{
       if(m[r]){const tip=N[r]+' req '+m[r][0]+(m[r][1]?': '+m[r][1]:'');
         body+='<td><button type="button" class="c '+cls+'" data-ri="'+ri+'" data-r="'+r+'" title="'+esc(tip+' (tap for activities)')+'" aria-label="'+esc(tip+', show activities')+'" aria-expanded="false" aria-controls="detail">'+esc(m[r][0])+'</button></td>';}
@@ -399,21 +404,19 @@ function tile(a){
   [['Energy level',a.energy],['Supplies',a.supplies],['Prep time',a.prep]].forEach(([l,v])=>{if(v)rows.push('<div><span>'+l+'</span>'+dots(l,v)+'</div>')});
   return '<div class="tile"><div class="tt"><a href="'+esc(a.url)+'" target="_blank" rel="noopener">'+esc(a.title)+'</a></div>'+(rows.length?'<div class="tm">'+rows.join('')+'</div>':'')+'</div>';
 }
-let openBtn=null;
+let openEls=[],openKey=null,openTrigger=null;
 function closeDetail(refocus){
   const d=$('detail');d.hidden=true;d.innerHTML='';
-  if(openBtn){openBtn.setAttribute('aria-expanded','false');if(refocus&&document.body.contains(openBtn))openBtn.focus();openBtn=null}
+  openEls.forEach(b=>b.setAttribute('aria-expanded','false'));
+  const tr=openTrigger;openEls=[];openKey=null;openTrigger=null;
+  if(refocus&&tr&&document.body.contains(tr))tr.focus();
 }
-function showDetail(btn){
-  if(openBtn===btn){closeDetail(true);return}
-  if(openBtn)openBtn.setAttribute('aria-expanded','false');
-  openBtn=btn;btn.setAttribute('aria-expanded','true');
-  const t=cur,r=btn.dataset.r,row=t.rows[+btn.dataset.ri],[num,note]=row[1][r];
+function section(t,ri,r){
+  const row=t.rows[ri],[num,note]=row[1][r];
   const adv=ACTIVITIES[LOOPS[t.id][r][0]]||{};
-  let h='<div class="dh"><img class="dloop" src="'+loopImg(t,r)+'" alt="">'
+  let h='<section class="dsec"><div class="dh"><img class="dloop" src="'+loopImg(t,r)+'" alt="">'
     +'<div style="flex:1;min-width:0"><h3>'+esc(N[r]+' · '+t.adv[r]+' · requirement '+num)+'</h3>'
-    +'<p class="meta">'+esc(row[0])+' · <a href="'+advUrl(t,r)+'" target="_blank" rel="noopener">Open the full adventure page</a></p></div>'
-    +'<button type="button" class="dclose" id="dclose">Close</button></div>';
+    +'<p class="meta">'+esc(row[0])+' · <a href="'+advUrl(t,r)+'" target="_blank" rel="noopener">Open the full adventure page</a></p></div></div>';
   if(note)h+='<div class="dreq"><span class="cellnote">'+esc(N[r]+': '+note)+'</span></div>';
   reqNums(num).forEach(q=>{
     const e=adv[q];
@@ -425,13 +428,33 @@ function showDetail(btn){
     }
     h+='</div>';
   });
-  const d=$('detail');d.innerHTML=h;d.hidden=false;
+  return h+'</section>';
+}
+// items: [[rowIndex, rank], ...]; els: the buttons to mark as open; trigger: the button to refocus on close.
+function openDetail(key,items,els,trigger,align){
+  if(openKey===key){closeDetail(true);return}
+  closeDetail(false);
+  openKey=key;openEls=els;openTrigger=trigger;
+  els.forEach(b=>b.setAttribute('aria-expanded','true'));
+  const d=$('detail');
+  d.innerHTML=items.map(([ri,r])=>section(cur,ri,r)).join('')+'<button type="button" class="dclose" id="dclose">Close</button>';
+  d.hidden=false;
   $('dclose').addEventListener('click',()=>closeDetail(true));
   d.focus({preventScroll:true});
-  d.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  d.scrollIntoView({block:align,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
-$('body').addEventListener('click',e=>{const b=e.target.closest('button.c');if(b)showDetail(b)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&openBtn)closeDetail(true)});
+$('body').addEventListener('click',e=>{
+  const c=e.target.closest('button.c');
+  if(c){openDetail('c'+c.dataset.ri+c.dataset.r,[[+c.dataset.ri,c.dataset.r]],[c],c,'nearest');return}
+  const n=e.target.closest('button.rowname');
+  if(n){
+    const ri=+n.dataset.ri,m=cur.rows[ri][1];
+    const ranks=R.filter(r=>m[r]); // R is ordered youngest to oldest
+    const cells=[...n.closest('tr').querySelectorAll('button.c')];
+    openDetail('r'+ri,ranks.map(r=>[ri,r]),[n,...cells],n,'start');
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&openKey)closeDetail(true)});
 
 function li(k,m,rs){
   const d=rs.filter(r=>m[r]&&m[r][1]).map(r=>NS[r]+': '+m[r][1]);
@@ -473,6 +496,7 @@ $('copy').addEventListener('click',async()=>{
         const c=doc.getElementById('cap');c.style.width='900px';c.style.padding='20px';
         doc.getElementById('capTitle').style.display='block';
         c.querySelector('.scroll').style.overflow='visible';
+        c.querySelectorAll('.rowname').forEach(b=>{b.style.textDecoration='none'});
         const lg=c.querySelector('.legend span:last-child');if(lg)lg.textContent='Numbers are requirement numbers.';
       }});
     const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
