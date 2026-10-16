@@ -57,6 +57,9 @@ h2{font-family:Bitter,Georgia,serif;font-weight:700;font-size:26px;margin:0}
 .cap-title{display:none;font-family:Bitter,Georgia,serif;font-weight:700;font-size:20px;margin:0 0 8px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:0 0 12px}
 .c{display:inline-block;min-width:28px;padding:2px 7px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;line-height:1.5}
+a.c{text-decoration:none}
+a.c:hover{text-decoration:underline;filter:brightness(.95)}
+a.c:focus-visible{outline:3px solid var(--strap);outline-offset:2px}
 .al{background:var(--all-bg);color:var(--all-ink)}
 .sh{background:var(--sh-bg);color:var(--sh-ink)}
 .un{background:var(--un-bg);color:var(--un-ink)}
@@ -131,6 +134,11 @@ footer a{color:inherit}
 const R=['L','T','W','B','We','A'];
 const N={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'Arrow of Light'};
 const NS={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'AOL'};
+const SITE='https://www.scouting.org/';
+const RANK_SLUG={L:'lion',T:'tiger',W:'wolf',B:'bear',We:'webelos',A:'arrow-of-light'};
+const slug=n=>n.toLowerCase().replace(/['\u2019]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+// Bobcat has no single adventure page per rank, so it links to the rank's adventure list.
+const advUrl=(t,r)=>t.id==='bobcat'?SITE+'programs/cub-scouts/adventures/'+RANK_SLUG[r]+'/':SITE+'cub-scout-adventures/'+slug(t.adv[r])+'/';
 const THEMES=[
 {id:'bicycling',name:'Bicycling',kind:'Elective',
  adv:{L:'On a Roll',T:'Rolling Tigers',W:'Pedal with the Pack',B:'Bears on Bikes',We:'Pedal Away',A:'Cycling'},
@@ -290,7 +298,7 @@ function render(){
     body+='<tr><td class="sk">'+esc(k)+'</td>';
     R.forEach(r=>{
       if(m[r]){const tip=N[r]+' req '+m[r][0]+(m[r][1]?': '+m[r][1]:'');
-        body+='<td><span class="c '+cls+'" title="'+esc(tip)+'" aria-label="'+esc(tip)+'" tabindex="0">'+esc(m[r][0])+'</span></td>';}
+        body+='<td><a class="c '+cls+'" href="'+advUrl(t,r)+'" target="_blank" rel="noopener" title="'+esc(tip+' (opens scouting.org)')+'" aria-label="'+esc(tip+', opens scouting.org')+'">'+esc(m[r][0])+'</a></td>';}
       else body+='<td></td>';
     });
     body+='</tr>';
