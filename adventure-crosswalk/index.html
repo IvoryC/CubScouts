@@ -61,6 +61,10 @@ h2{font-family:Bitter,Georgia,serif;font-weight:700;font-size:26px;margin:0}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin:0 0 12px}
 .c{display:inline-block;min-width:28px;padding:2px 7px;border-radius:6px;font-size:13px;font-weight:700;text-align:center;line-height:1.5}
 a.c{text-decoration:none}
+.loopimg{display:inline-block;line-height:0;border-radius:6px}
+.loopimg img{width:48px;height:auto;border-radius:6px;display:block;margin:0 auto 4px}
+.loopimg:hover img{outline:2px solid var(--strap)}
+.loopimg:focus-visible{outline:3px solid var(--strap);outline-offset:2px}
 a.c:hover{text-decoration:underline;filter:brightness(.95)}
 a.c:focus-visible{outline:3px solid var(--strap);outline-offset:2px}
 .al{background:var(--all-bg);color:var(--all-ink)}
@@ -138,10 +142,45 @@ const R=['L','T','W','B','We','A'];
 const N={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'Arrow of Light'};
 const NS={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'AOL'};
 const SITE='https://www.scouting.org/';
-const RANK_SLUG={L:'lion',T:'tiger',W:'wolf',B:'bear',We:'webelos',A:'arrow-of-light'};
-const slug=n=>n.toLowerCase().replace(/['\u2019]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-// Bobcat has no single adventure page per rank, so it links to the rank's adventure list.
-const advUrl=(t,r)=>t.id==='bobcat'?SITE+'programs/cub-scouts/adventures/'+RANK_SLUG[r]+'/':SITE+'cub-scout-adventures/'+slug(t.adv[r])+'/';
+// Adventure page slug and belt-loop image (under /wp-content/uploads/) for each theme and rank, as listed on scouting.org's rank pages.
+const LOOPS={"bicycling":{"L":["on-a-roll","2024/01/2023_2024_loops_pins_On_a_Roll.jpg"],
+  "T":["rolling-tigers","2024/01/2023_2024_loops_pins_Rolling_Tigers.jpg"],
+  "W":["pedal-with-the-pack","2023/11/2023_2024_loops_pins_Pedal_With_the_Pack.jpg"],
+  "B":["bears-on-bikes","2024/01/2023_2024_loops_pins_Bears_on_Bikes.jpg"],
+  "We":["pedal-away","2024/01/2023_2024_loops_pins_Pedal_Away.jpg"],
+  "A":["cycling","2024/05/2023_2024_loops_pins_Cycling.jpg"]},"bobcat":{"L":["bobcat-lion","2024/01/2023_2024_loops_pins_Lion_Bobcat.jpg"],
+  "T":["bobcat-tiger","2024/04/2023_2024_loops_pins_Tiger-Bobcat.jpg"],
+  "W":["bobcat-wolf","2024/04/2023_2024_loops_pins_Wolf_Bobcat.jpg"],
+  "B":["bobcat-bear","2024/01/2023_2024_loops_pins_Bear_Bobcat-1.jpg"],
+  "We":["bobcat-webelos","2024/01/2023_2024_loops_pins_Webelos_Bobcat_edit.jpg"],
+  "A":["bobcat-aol","elementor/thumbs/2023_2024_loops_pins_AOL_Bobcat_edit-qmlxef4p8shftrpsfwntmdksdipw5oyo6k3e2xhxs0.jpg"]},"citizenship":{"L":["king-of-the-jungle","2024/01/2023_2024_loops_pins_King_of_The_Jungle.jpg"],
+  "T":["team-tiger","2024/04/2023_2024_loops_pins_Team_Tiger.jpg"],
+  "W":["council-fire","2024/04/2023_2024_loops_pins_Council_Fire.jpg"],
+  "B":["paws-for-action","2024/01/2023_2024_loops_pins_Paws_For_Action.jpg"],
+  "We":["my-community","2024/01/2023_2024_loops_pins_My_Community.jpg"],
+  "A":["citizenship","2024/04/2023_2024_loops_pins_Citizenship.jpg"]},"family":{"L":["lions-pride","2024/01/2023_2024_loops_pins_Lions_Pride.jpg"],
+  "T":["tiger-circles","2024/04/2023_2024_loops_pins_Tiger_Circles.jpg"],
+  "W":["footsteps","2024/04/2023_2024_loops_pins_Footsteps.jpg"],
+  "B":["fellowship","2024/02/2023_2024_loops_pins_Fellowship.jpg"],
+  "We":["my-family","2024/01/2023_2024_loops_pins_My_Family.jpg"],
+  "A":["duty-to-god","2024/04/2023_2024_loops_pins_AOL_Duty_to_God.jpg"]},"outdoors":{"L":["mountain-lion","2024/01/2023_2024_loops_pins_Mountain_Lion.jpg"],
+  "T":["tigers-in-the-wild","2024/04/2023_2024_loops_pins_Tigers_in_the_Wild.jpg"],
+  "W":["paws-on-the-path","2024/04/2023_2024_loops_pins_Paws_on_the_Path.jpg"],
+  "B":["bear-habitat","2024/02/2023_2024_loops_pins_Bear_Habitat.jpg"],
+  "We":["webelos-walkabout","2024/01/2023_2024_loops_pins_Webelos_Walkabout.jpg"],
+  "A":["outdoor-adventurer","2024/04/2023_2024_loops_pins_AOL_Outdoor_Adventurer.jpg"]},"fitness":{"L":["fun-on-the-run","2024/01/2023_2024_loops_pins_Fun_On_The_Run.jpg"],
+  "T":["tiger-bites","2024/04/2023_2024_loops_pins_Tiger_Bites.jpg"],
+  "W":["running-with-the-pack","2024/04/2023_2024_loops_pins_Running_With_the_Pack.jpg"],
+  "B":["bear-strong","2024/02/2023_2024_loops_pins_Bear_Strong.jpg"],
+  "We":["stronger-faster-higher","2024/01/2023_2024_loops_pins_Stronger_Faster_Higher.jpg"],
+  "A":["personal-fitness","2024/04/2023_2024_loops_pins_Personal_Fitness.jpg"]},"safety":{"L":["lions-roar","2024/01/2023_2024_loops_pins_Lions_Roar.jpg"],
+  "T":["tigers-roar","2024/04/2023_2024_loops_pins_Tigers-Roar.jpg"],
+  "W":["safety-in-numbers","2024/04/2023_2024_loops_pins_Safety_in_Numbers.jpg"],
+  "B":["standing-tall","2024/01/2023_2024_loops_pins_Standing_Tall.jpg"],
+  "We":["my-safety","2024/02/2023_2024_loops_pins_My_Safety.jpg"],
+  "A":["first-aid","2024/04/2023_2024_loops_pins_First_Aid.jpg"]}};
+const advUrl=(t,r)=>SITE+'cub-scout-adventures/'+LOOPS[t.id][r][0]+'/';
+const loopImg=(t,r)=>SITE+'wp-content/uploads/'+LOOPS[t.id][r][1];
 const THEMES=[
 {id:'bicycling',name:'Bicycling',kind:'Elective',
  adv:{L:'On a Roll',T:'Rolling Tigers',W:'Pedal with the Pack',B:'Bears on Bikes',We:'Pedal Away',A:'Cycling'},
@@ -243,7 +282,7 @@ const THEMES=[
  ['Track activity for 14 days',{A:['2','Also reflect on being physically fit']}]
  ],foot:''},
 {id:'safety',name:'Personal safety',kind:'Required',
- adv:{L:'Lion Roar',T:'Tiger Roar',W:'Safety in Numbers',B:'Standing Tall',We:'My Safety',A:'First Aid'},
+ adv:{L:"Lion's Roar",T:"Tiger's Roar",W:'Safety in Numbers',B:'Standing Tall',We:'My Safety',A:'First Aid'},
  rows:[
  ['Watch the Protect Yourself Rules video',{L:['1',''],T:['1',''],W:['1',''],B:['1',''],We:['1',''],A:['1','']}],
  ['Shout, Run, Tell',{L:['2',''],T:['2','']}],
@@ -293,7 +332,9 @@ function render(){
   $('sub').textContent=t.kind+' adventures'+(t.id==='bobcat'?'':' — '+R.map(r=>t.adv[r]).join(', '));
   $('capTitle').textContent=t.name+' ('+t.kind.toLowerCase()+') requirements by rank';
   let h='<th class="sk" scope="col">Skill</th>';
-  R.forEach(r=>{h+='<th scope="col">'+NS[r]+(t.id==='bobcat'?'':'<span class="adv">'+esc(t.adv[r])+'</span>')+'</th>'});
+  R.forEach(r=>{
+    const lab=N[r]+': '+t.adv[r];
+    h+='<th scope="col"><a class="loopimg" href="'+advUrl(t,r)+'" target="_blank" rel="noopener" title="'+esc(lab+' (opens scouting.org)')+'" aria-label="'+esc(lab+', opens scouting.org')+'"><img src="'+loopImg(t,r)+'" crossorigin="anonymous" alt="'+esc(lab)+' belt loop" width="48" height="64"></a>'+(t.id==='bobcat'?'':'<span class="adv">'+esc(t.adv[r])+'</span>')+'</th>'});
   $('head').innerHTML=h;
   let body='';
   t.rows.forEach(([k,m])=>{
@@ -348,7 +389,7 @@ $('copy').addEventListener('click',async()=>{
   st.textContent='Making the image…';
   const bg=getComputedStyle($('cap')).backgroundColor;
   try{
-    const canvas=await html2canvas($('cap'),{backgroundColor:bg,scale:2,windowWidth:1100,
+    const canvas=await html2canvas($('cap'),{backgroundColor:bg,scale:2,useCORS:true,windowWidth:1100,
       onclone:doc=>{
         const c=doc.getElementById('cap');c.style.width='900px';c.style.padding='20px';
         doc.getElementById('capTitle').style.display='block';
