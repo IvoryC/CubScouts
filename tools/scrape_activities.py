@@ -10,7 +10,7 @@ Usage: python3 tools/scrape_activities.py [--cache DIR]
 Standard library only. Pages are cached in DIR (default: .cache/, git-ignored)
 so reruns don't refetch; delete the cache to pick up site changes.
 """
-import html, json, os, re, sys, time, urllib.request
+import html, json, os, re, sys, time, urllib.error, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOOPS_JS = os.path.join(ROOT, 'adventure-crosswalk', 'data', 'loops.js')
@@ -75,7 +75,13 @@ def parse(page):
 
 data = {}
 for s in slugs():
-    data[s] = parse(fetch(s))
+    try:
+        page = fetch(s)
+    except urllib.error.HTTPError as e:
+        # The range adventures (archery, BB gun, slingshot) have no page; see data/range-requirements.js.
+        print('%-34s skipped (HTTP %s)' % (s, e.code))
+        continue
+    data[s] = parse(page)
     n = sum(len(r['acts']) for r in data[s].values())
     print('%-34s %d reqs, %d activities' % (s, len(data[s]), n))
 

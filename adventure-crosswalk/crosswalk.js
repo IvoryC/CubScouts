@@ -2,8 +2,13 @@ const R=['L','T','W','B','We','A'];
 const N={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'Arrow of Light'};
 const NS={L:'Lion',T:'Tiger',W:'Wolf',B:'Bear',We:'Webelos',A:'AOL'};
 const SITE='https://www.scouting.org/';
-const advUrl=(t,r)=>SITE+'cub-scout-adventures/'+LOOPS[t.id][r][0]+'/';
-const loopImg=(t,r)=>SITE+'wp-content/uploads/'+LOOPS[t.id][r][1];
+// A rank can have no adventure in a theme, one, or several (LOOPS holds a [slug, image] pair or a list of pairs).
+const advList=(t,r)=>{const v=LOOPS[t.id][r];return v?(Array.isArray(v[0])?v:[v]):[]};
+const advNames=(t,r)=>t.adv[r]?[].concat(t.adv[r]):[];
+// Themes with a `link` (the range adventures) have no per-adventure pages, so every rank links to that one document.
+const advUrl=(t,r,k=0)=>t.link||SITE+'cub-scout-adventures/'+advList(t,r)[k][0]+'/';
+const loopImg=(t,r,k=0)=>SITE+'wp-content/uploads/'+advList(t,r)[k][1];
+Object.assign(ACTIVITIES,RANGE_REQS);
 
 
 const $=id=>document.getElementById(id);
@@ -11,13 +16,15 @@ let cur=THEMES[0];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 
 // ---- Adventure picker: a listbox dropdown, required adventures first (pale gold), then electives
+const KIND_SUB={Required:'Required adventures',Elective:'Elective theme',Range:'Range and target sports'};
+const GROUPS={Required:['Required adventures',''],Elective:['Elective themes',''],Range:['Range and target sports','Council and district events only']};
 const pickBtn=$('pickBtn'),pickList=$('pickList');
 const optId=t=>'opt-'+t.id;
 let activeIdx=0,typed='',typedAt=0;
 function buildPicker(){
   let h='',grp='';
   THEMES.forEach(t=>{
-    if(t.kind!==grp){grp=t.kind;h+='<li class="grp" role="presentation">'+(grp==='Required'?'Required adventures':'Elective adventures')+'</li>'}
+    if(t.kind!==grp){grp=t.kind;h+='<li class="grp" role="presentation">'+GROUPS[grp][0]+(GROUPS[grp][1]?'<small>'+GROUPS[grp][1]+'</small>':'')+'</li>'}
     h+='<li role="option" id="'+optId(t)+'" data-id="'+t.id+'" class="opt'+(t.kind==='Required'?' req':'')+'"><span>'+esc(t.name)+'</span><span class="tag">'+t.kind+'</span></li>';
   });
   pickList.innerHTML=h;
@@ -81,19 +88,26 @@ function render(){
   const t=cur;
   syncPicker();
   $('title').textContent=t.name;
-  $('sub').textContent=t.kind+' adventures'+(t.id==='bobcat'?'':' — '+R.map(r=>t.adv[r]).join(', '));
+  $('sub').textContent=KIND_SUB[t.kind]+(t.id==='bobcat'?'':' — '+[...new Set(R.flatMap(r=>advNames(t,r)))].join(', '));
+  $('themeNote').textContent=t.note||'';
+  $('themeNote').hidden=!t.note;
   $('capTitle').textContent=t.name+' ('+t.kind.toLowerCase()+') requirements by rank';
   let h='<th class="sk" scope="col">Skill</th>';
   R.forEach(r=>{
-    const lab=N[r]+': '+t.adv[r];
-    h+='<th scope="col"><a class="loopimg" href="'+advUrl(t,r)+'" target="_blank" rel="noopener" title="'+esc(lab+' (opens scouting.org)')+'" aria-label="'+esc(lab+', opens scouting.org')+'"><img src="'+loopImg(t,r)+'" crossorigin="anonymous" alt="'+esc(lab)+' belt loop" width="48" height="64"></a>'+(t.id==='bobcat'?'':'<span class="adv">'+esc(t.adv[r])+'</span>')+'</th>'});
+    const names=advNames(t,r);
+    if(!names.length){h+='<th scope="col"><span class="adv" aria-label="'+esc(N[r]+': no adventure in this theme')+'">&mdash;</span></th>';return}
+    const multi=names.length>1;
+    h+='<th scope="col"><div class="loopset'+(multi?' multi':'')+'">'+names.map((nm,k)=>{
+      const lab=N[r]+': '+nm;
+      return '<a class="loopimg" href="'+advUrl(t,r,k)+'" target="_blank" rel="noopener" title="'+esc(lab+' (opens scouting.org)')+'" aria-label="'+esc(lab+', opens scouting.org')+'"><img src="'+loopImg(t,r,k)+'" crossorigin="anonymous" alt="'+esc(lab)+' belt loop" width="48" height="64"></a>'}).join('')+'</div>'
+      +(t.id==='bobcat'?'':names.map(nm=>'<span class="adv">'+esc(nm)+'</span>').join(''))+'</th>'});
   $('head').innerHTML=h;
   let body='';
   t.rows.forEach(([k,m],ri)=>{
     const n=Object.keys(m).length, cls=n===6?'al':n>1?'sh':'un';
     body+='<tr><td class="sk"><button type="button" class="rowname" data-ri="'+ri+'" aria-expanded="false" aria-controls="detail" title="Show activities for every rank">'+esc(k)+'</button></td>';
     R.forEach(r=>{
-      if(m[r]){const tip=N[r]+' req '+m[r][0]+(m[r][1]?': '+m[r][1]:'');
+      if(m[r]){const nm=advNames(t,r);const tip=N[r]+(nm.length>1?' ('+nm[m[r][2]||0]+')':'')+' req '+m[r][0]+(m[r][1]?': '+m[r][1]:'');
         body+='<td><button type="button" class="c '+cls+'" data-ri="'+ri+'" data-r="'+r+'" title="'+esc(tip+' (tap for activities)')+'" aria-label="'+esc(tip+', show activities')+'" aria-expanded="false" aria-controls="detail">'+esc(m[r][0])+'</button></td>';}
       else body+='<td></td>';
     });
@@ -128,11 +142,11 @@ function closeDetail(refocus){
   if(refocus&&tr&&document.body.contains(tr))tr.focus();
 }
 function section(t,ri,r){
-  const row=t.rows[ri],[num,note]=row[1][r];
-  const adv=ACTIVITIES[LOOPS[t.id][r][0]]||{};
-  let h='<section class="dsec"><div class="dh"><img class="dloop" src="'+loopImg(t,r)+'" alt="">'
-    +'<div style="flex:1;min-width:0"><h3>'+esc(N[r]+' · '+t.adv[r]+' · requirement '+num)+'</h3>'
-    +'<p class="meta">'+esc(row[0])+' · <a href="'+advUrl(t,r)+'" target="_blank" rel="noopener">Open the full adventure page</a></p></div></div>';
+  const row=t.rows[ri],[num,note,k=0]=row[1][r];
+  const adv=ACTIVITIES[advList(t,r)[k][0]]||{};
+  let h='<section class="dsec"><div class="dh"><img class="dloop" src="'+loopImg(t,r,k)+'" alt="">'
+    +'<div style="flex:1;min-width:0"><h3>'+esc(N[r]+' · '+advNames(t,r)[k]+' · requirement '+num)+'</h3>'
+    +'<p class="meta">'+esc(row[0])+' · <a href="'+advUrl(t,r,k)+'" target="_blank" rel="noopener">'+(t.link?'Open the lesson plan (PDF)':'Open the full adventure page')+'</a></p></div></div>';
   if(note)h+='<div class="dreq"><span class="cellnote">'+esc(N[r]+': '+note)+'</span></div>';
   reqNums(num).forEach(q=>{
     const e=adv[q];
@@ -140,7 +154,7 @@ function section(t,ri,r){
     if(!e)h+='<p class="none">No activity list found for this requirement. Check the adventure page.</p>';
     else{
       h+='<p class="req-text">'+esc(e.text)+'</p>';
-      h+=e.acts.length?'<div class="tiles">'+e.acts.map(tile).join('')+'</div>':'<p class="none">No activities are listed for this requirement.</p>';
+      h+=e.acts.length?'<div class="tiles">'+e.acts.map(tile).join('')+'</div>':'<p class="none">'+esc(t.noActs||'No activities are listed for this requirement.')+'</p>';
     }
     h+='</div>';
   });
