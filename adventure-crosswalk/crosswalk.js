@@ -15,71 +15,110 @@ const $=id=>document.getElementById(id);
 let cur=THEMES[0];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 
-// ---- Adventure picker: a listbox dropdown, required adventures first (pale gold), then electives
+// ---- Pickers: two listbox dropdowns. "Theme" lists the themes (required first, in pale gold, then electives, then range).
+// "Adventure name" lists every adventure by rank; choosing one just selects the theme it belongs to and shows its name.
 const KIND_SUB={Required:'Required adventures',Elective:'Elective theme',Range:'Range and target sports'};
 const GROUPS={Required:['Required adventures',''],Elective:['Elective themes',''],Range:['Range and target sports','Council and district events only']};
-const pickBtn=$('pickBtn'),pickList=$('pickList');
-const optId=t=>'opt-'+t.id;
-let activeIdx=0,typed='',typedAt=0;
-function buildPicker(){
+const RANK_NAME=r=>N[r];
+
+// Wires one dropdown: open/close, arrow keys, Home/End, Enter/Space, Escape, type-ahead, mouse.
+// selectedIndex(): option index to start on when opening; onChoose(optionElement): called with the chosen option.
+function wireListbox(btn,list,selectedIndex,onChoose){
+  let activeIdx=0,typed='',typedAt=0;
+  const opts=()=>[...list.querySelectorAll('[role=option]')];
+  function setActive(i){
+    const o=opts();activeIdx=Math.max(0,Math.min(o.length-1,i));
+    o.forEach((x,j)=>x.classList.toggle('active',j===activeIdx));
+    list.setAttribute('aria-activedescendant',o[activeIdx].id);
+    o[activeIdx].scrollIntoView({block:'nearest'});
+  }
+  function open(){
+    pickers.forEach(p=>{if(p.list!==list)p.close(false)});
+    list.hidden=false;btn.setAttribute('aria-expanded','true');
+    setActive(Math.max(0,selectedIndex()));list.focus();
+  }
+  function close(refocus){
+    if(list.hidden)return;
+    list.hidden=true;btn.setAttribute('aria-expanded','false');
+    if(refocus)btn.focus();
+  }
+  function choose(el){close(true);onChoose(el)}
+  btn.addEventListener('click',()=>list.hidden?open():close(true));
+  btn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();open()}});
+  list.addEventListener('click',e=>{const o=e.target.closest('[role=option]');if(o)choose(o)});
+  list.addEventListener('mousemove',e=>{const o=e.target.closest('[role=option]');if(o){const i=opts().indexOf(o);if(i!==activeIdx)setActive(i)}});
+  list.addEventListener('keydown',e=>{
+    const o=opts();
+    if(e.key==='ArrowDown'){e.preventDefault();setActive(activeIdx+1)}
+    else if(e.key==='ArrowUp'){e.preventDefault();setActive(activeIdx-1)}
+    else if(e.key==='Home'){e.preventDefault();setActive(0)}
+    else if(e.key==='End'){e.preventDefault();setActive(o.length-1)}
+    else if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(o[activeIdx])}
+    else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close(true)}
+    else if(e.key==='Tab'){close(false)}
+    else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){
+      const now=Date.now();typed=(now-typedAt<700?typed:'')+e.key.toLowerCase();typedAt=now;
+      const starts=x=>x.firstChild.textContent.toLowerCase().startsWith(typed);
+      const hit=o.findIndex((x,j)=>j>=(typed.length>1?activeIdx:activeIdx+1)&&starts(x));
+      const i=hit>=0?hit:o.findIndex(starts);
+      if(i>=0)setActive(i);
+    }
+  });
+  const p={list,close};pickers.push(p);return p;
+}
+const pickers=[];
+document.addEventListener('click',e=>{pickers.forEach(p=>{if(!p.list.hidden&&!p.list.closest('.picker').contains(e.target))p.close(false)})});
+
+// -- Theme dropdown
+const pickBtn=$('pickBtn'),pickList=$('pickList'),advBtn=$('advBtn'),advMenu=$('advList');
+let advSel=null; // {theme, rank, k, name}: set when the theme was reached through the Adventure name dropdown
+function buildThemePicker(){
   let h='',grp='';
   THEMES.forEach(t=>{
     if(t.kind!==grp){grp=t.kind;h+='<li class="grp" role="presentation">'+GROUPS[grp][0]+(GROUPS[grp][1]?'<small>'+GROUPS[grp][1]+'</small>':'')+'</li>'}
-    h+='<li role="option" id="'+optId(t)+'" data-id="'+t.id+'" class="opt'+(t.kind==='Required'?' req':'')+'"><span>'+esc(t.name)+'</span><span class="tag">'+t.kind+'</span></li>';
+    h+='<li role="option" id="opt-'+t.id+'" data-id="'+t.id+'" class="opt'+(t.kind==='Required'?' req':'')+'"><span>'+esc(t.name)+'</span><span class="tag">'+t.kind+'</span></li>';
   });
   pickList.innerHTML=h;
+}
+// -- Adventure name dropdown: one section per rank, adventures A to Z, each tagged with its theme
+function buildAdvPicker(){
+  const byName=(a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:'base',ignorePunctuation:true});
+  let h='';
+  R.forEach(r=>{
+    const items=[];
+    THEMES.forEach(t=>advNames(t,r).forEach((name,k)=>items.push({t,k,name})));
+    items.sort(byName);
+    h+='<li class="grp" role="presentation">'+esc(RANK_NAME(r))+'</li>';
+    items.forEach(({t,k,name})=>{
+      h+='<li role="option" id="adv-'+r+'-'+t.id+'-'+k+'" data-theme="'+t.id+'" data-rank="'+r+'" data-k="'+k+'" class="opt'+(t.kind==='Required'?' req':'')+'"><span>'+esc(name)+'</span><span class="tag">'+esc(t.name)+'</span></li>';
+    });
+  });
+  advMenu.innerHTML=h;
 }
 function syncPicker(){
   $('pickCur').textContent=cur.name;
   $('pickTag').textContent=cur.kind;
   pickBtn.classList.toggle('req',cur.kind==='Required');
   pickList.querySelectorAll('[role=option]').forEach(o=>o.setAttribute('aria-selected',o.dataset.id===cur.id));
+  // the Adventure name box shows a name only while it is what led to the current theme
+  if(advSel&&advSel.theme!==cur.id)advSel=null;
+  const ac=$('advCur');
+  ac.textContent=advSel?advSel.name:'Find by adventure name…';
+  ac.classList.toggle('ph',!advSel);
+  $('advTag').textContent=advSel?N[advSel.rank]:'';
+  advBtn.classList.toggle('req',!!advSel&&cur.kind==='Required');
+  advMenu.querySelectorAll('[role=option]').forEach(o=>o.setAttribute('aria-selected',!!advSel&&o.id==='adv-'+advSel.rank+'-'+advSel.theme+'-'+advSel.k));
   $('panel').setAttribute('aria-label',cur.name+' adventure crosswalk');
 }
-const opts=()=>[...pickList.querySelectorAll('[role=option]')];
-function setActive(i){
-  const o=opts();activeIdx=Math.max(0,Math.min(o.length-1,i));
-  o.forEach((x,j)=>x.classList.toggle('active',j===activeIdx));
-  pickList.setAttribute('aria-activedescendant',o[activeIdx].id);
-  o[activeIdx].scrollIntoView({block:'nearest'});
-}
-function openPicker(){
-  pickList.hidden=false;pickBtn.setAttribute('aria-expanded','true');
-  setActive(THEMES.indexOf(cur));pickList.focus();
-}
-function closePicker(refocus){
-  if(pickList.hidden)return;
-  pickList.hidden=true;pickBtn.setAttribute('aria-expanded','false');
-  if(refocus)pickBtn.focus();
-}
-function choose(id){
-  closePicker(true);
-  if(id!==cur.id)location.hash=id;
-}
-pickBtn.addEventListener('click',()=>pickList.hidden?openPicker():closePicker(true));
-pickBtn.addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();openPicker()}
+wireListbox(pickBtn,pickList,()=>THEMES.indexOf(cur),o=>{
+  advSel=null;                       // choosing a theme directly blanks the Adventure name box
+  if(o.dataset.id!==cur.id)location.hash=o.dataset.id;else syncPicker();
 });
-pickList.addEventListener('click',e=>{const o=e.target.closest('[role=option]');if(o)choose(o.dataset.id)});
-pickList.addEventListener('mousemove',e=>{const o=e.target.closest('[role=option]');if(o){const i=opts().indexOf(o);if(i!==activeIdx)setActive(i)}});
-pickList.addEventListener('keydown',e=>{
-  const o=opts();
-  if(e.key==='ArrowDown'){e.preventDefault();setActive(activeIdx+1)}
-  else if(e.key==='ArrowUp'){e.preventDefault();setActive(activeIdx-1)}
-  else if(e.key==='Home'){e.preventDefault();setActive(0)}
-  else if(e.key==='End'){e.preventDefault();setActive(o.length-1)}
-  else if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(o[activeIdx].dataset.id)}
-  else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closePicker(true)}
-  else if(e.key==='Tab'){closePicker(false)}
-  else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){
-    const now=Date.now();typed=(now-typedAt<700?typed:'')+e.key.toLowerCase();typedAt=now;
-    const hit=o.findIndex((x,j)=>j>=(typed.length>1?activeIdx:activeIdx+1)&&x.firstChild.textContent.toLowerCase().startsWith(typed))
-      ;const i=hit>=0?hit:o.findIndex(x=>x.firstChild.textContent.toLowerCase().startsWith(typed));
-    if(i>=0)setActive(i);
-  }
+wireListbox(advBtn,advMenu,()=>advSel?[...advMenu.querySelectorAll('[role=option]')].findIndex(o=>o.id==='adv-'+advSel.rank+'-'+advSel.theme+'-'+advSel.k):0,o=>{
+  advSel={theme:o.dataset.theme,rank:o.dataset.rank,k:+o.dataset.k,name:o.firstChild.textContent};
+  if(advSel.theme!==cur.id)location.hash=advSel.theme;else syncPicker();
 });
-document.addEventListener('click',e=>{if(!pickList.hidden&&!e.target.closest('.picker'))closePicker(false)});
-buildPicker();
+buildThemePicker();buildAdvPicker();
 
 ['a','b'].forEach(id=>R.forEach(r=>$(id).add(new Option(N[r],r))));
 $('a').value='B';$('b').value='W';

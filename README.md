@@ -10,7 +10,7 @@ Planning tools for den leaders and families, published with GitHub Pages.
 | `adventure-crosswalk/` | Requirement crosswalk for the six required adventures and the bicycling elective, Lion through Arrow of Light, with a two-rank comparison and a copy-chart-as-image button |
 | `.nojekyll` | Tells GitHub Pages to serve files as-is |
 
-Each adventure in the crosswalk's dropdown has its own link, for example `adventure-crosswalk/#outdoors`. IDs are the `id` values in `adventure-crosswalk/data/themes.js`: the six required adventures (`bobcat`, `fitness`, `safety`, `family`, `citizenship`, `outdoors`), then the elective themes, then the range and target sports (`archery`, `bbgun`, `slingshot`). The dropdown groups them as Required adventures, Elective themes, and Range and target sports.
+Each adventure in the crosswalk's dropdown has its own link, for example `adventure-crosswalk/#outdoors`. IDs are the `id` values in `adventure-crosswalk/data/themes.js`: the six required adventures (`bobcat`, `fitness`, `safety`, `family`, `citizenship`, `outdoors`), then the elective themes, then the range and target sports (`archery`, `bbgun`, `slingshot`). The Theme dropdown groups them as Required adventures, Elective themes, and Range and target sports. A second dropdown, Adventure name, lists every adventure by rank (A to Z) and selects the theme it belongs to; it is built automatically from `THEMES`.
 
 ## Publish it
 

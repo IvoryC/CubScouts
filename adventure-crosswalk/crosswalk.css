@@ -119,24 +119,26 @@ footer{color:var(--muted);font-size:13px;padding:0 0 36px}
 footer a{color:inherit}
 @media (max-width:560px){header{padding-top:18px}.back{position:static;display:inline-block;margin-bottom:12px}.panel{padding:16px 14px 20px}h2{font-size:22px}}
 
-.strap .pickwrap{display:flex;align-items:center;gap:10px;max-width:1040px;margin:0 auto;padding:10px 20px}
+.strap .pickwrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;max-width:1040px;margin:0 auto;padding:10px 20px}
+.pickgroup{display:flex;align-items:center;gap:10px;flex:1 1 320px;min-width:0}
 .picklabel{color:var(--strap-ink);font-size:15px;white-space:nowrap}
 .picker{position:relative;flex:1;max-width:460px}
 .picker button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font:inherit;font-size:16px;font-weight:700;text-align:left;color:var(--ink);background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:8px 12px;cursor:pointer}
 .picker button.req{background:var(--req-bg);color:var(--req-ink)}
+.picker button .ph{font-weight:400;color:var(--muted)}
 .picker button .chev{margin-left:auto;font-size:14px}
 .tag{font-size:12px;font-weight:400;opacity:.8;white-space:nowrap}
-#pickList{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;margin:0;padding:6px;list-style:none;display:block;max-height:min(70vh,520px);overflow-y:auto;background:var(--panel);color:var(--ink);border:2px solid var(--strap);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
-#pickList[hidden]{display:none}
-#pickList:focus{outline:none}
-#pickList .grp{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 10px 2px}
-#pickList .grp small{display:block;text-transform:none;letter-spacing:0;font-size:12px;font-style:italic;margin-top:1px}
+.plist{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;margin:0;padding:6px;list-style:none;display:block;max-height:min(70vh,520px);overflow-y:auto;background:var(--panel);color:var(--ink);border:2px solid var(--strap);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.plist[hidden]{display:none}
+.plist:focus{outline:none}
+.plist .grp{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 10px 2px}
+.plist .grp small{display:block;text-transform:none;letter-spacing:0;font-size:12px;font-style:italic;margin-top:1px}
 .notebox{margin:0 0 12px;padding:8px 12px;border-left:5px solid var(--gold);background:var(--req-bg);color:var(--req-ink);border-radius:0 8px 8px 0;font-size:14px}
 .notebox[hidden]{display:none}
-#pickList .opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:16px;margin:2px 0}
-#pickList .opt.req{background:var(--req-bg);color:var(--req-ink)}
-#pickList .opt.active{box-shadow:inset 0 0 0 2px var(--strap)}
-#pickList .opt[aria-selected="true"]{font-weight:700}
-#pickList .opt[aria-selected="true"]::before{content:"\2713";margin-right:6px}
-#pickList .opt span:first-child{flex:1}
-@media (max-width:560px){.picklabel{display:none}}
+.plist .opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:16px;margin:2px 0}
+.plist .opt.req{background:var(--req-bg);color:var(--req-ink)}
+.plist .opt.active{box-shadow:inset 0 0 0 2px var(--strap)}
+.plist .opt[aria-selected="true"]{font-weight:700}
+.plist .opt[aria-selected="true"]::before{content:"\2713";margin-right:6px}
+.plist .opt span:first-child{flex:1}
+@media (max-width:560px){.picklabel{display:none}.strap{position:static}}

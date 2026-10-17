@@ -18,9 +18,14 @@
   <h1>Cub Scout adventure crosswalk</h1>
   <p class="lede">Each tab lines up one adventure theme across all six ranks, Lion through Arrow of Light, so you can see what dens share and what's unique. Handy for planning combined den meetings.</p>
 </header>
-<nav class="strap" aria-label="Choose an adventure"><div class="pickwrap"><span class="picklabel" id="pickLabel">Adventure</span>
-  <div class="picker"><button type="button" id="pickBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="pickList" aria-labelledby="pickLabel pickCur"><span id="pickCur"></span><span class="tag" id="pickTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
-  <ul id="pickList" role="listbox" tabindex="-1" aria-labelledby="pickLabel" hidden></ul></div></div></nav>
+<nav class="strap" aria-label="Choose an adventure theme"><div class="pickwrap">
+  <div class="pickgroup"><span class="picklabel" id="pickLabel">Theme</span>
+    <div class="picker"><button type="button" id="pickBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="pickList" aria-labelledby="pickLabel pickCur"><span id="pickCur"></span><span class="tag" id="pickTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
+    <ul id="pickList" class="plist" role="listbox" tabindex="-1" aria-labelledby="pickLabel" hidden></ul></div></div>
+  <div class="pickgroup"><span class="picklabel" id="advLabel">Adventure name</span>
+    <div class="picker"><button type="button" id="advBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="advList" aria-labelledby="advLabel advCur"><span id="advCur" class="ph"></span><span class="tag" id="advTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
+    <ul id="advList" class="plist" role="listbox" tabindex="-1" aria-labelledby="advLabel" hidden></ul></div></div>
+</div></nav>
 <main class="wrap">
   <section class="panel" role="region" id="panel" aria-live="polite">
     <div class="ph">
