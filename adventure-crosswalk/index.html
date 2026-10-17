@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="crosswalk.css">
+<link rel="stylesheet" href="crosswalk.css?v=2">
 </head>
 <body>
 <header class="wrap">
@@ -23,7 +23,7 @@
     <div class="picker"><button type="button" id="pickBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="pickList" aria-labelledby="pickLabel pickCur"><span id="pickCur"></span><span class="tag" id="pickTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
     <ul id="pickList" class="plist" role="listbox" tabindex="-1" aria-labelledby="pickLabel" hidden></ul></div></div>
   <div class="pickgroup"><span class="picklabel" id="advLabel">Adventure name</span>
-    <div class="picker"><button type="button" id="advBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="advList" aria-labelledby="advLabel advCur"><span id="advCur" class="ph"></span><span class="tag" id="advTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
+    <div class="picker"><button type="button" id="advBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="advList" aria-labelledby="advLabel advCur"><span id="advCur" class="blank"></span><span class="tag" id="advTag"></span><span class="chev" aria-hidden="true">&#9662;</span></button>
     <ul id="advList" class="plist" role="listbox" tabindex="-1" aria-labelledby="advLabel" hidden></ul></div></div>
 </div></nav>
 <main class="wrap">
@@ -66,6 +66,6 @@
 <script src="data/themes.js"></script>
 <script src="activities.js"></script>
 <script src="data/range-requirements.js"></script>
-<script src="crosswalk.js"></script>
+<script src="crosswalk.js?v=2"></script>
 </body>
 </html>

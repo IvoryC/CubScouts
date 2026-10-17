@@ -104,7 +104,7 @@ function syncPicker(){
   if(advSel&&advSel.theme!==cur.id)advSel=null;
   const ac=$('advCur');
   ac.textContent=advSel?advSel.name:'Find by adventure name…';
-  ac.classList.toggle('ph',!advSel);
+  ac.classList.toggle('blank',!advSel);
   $('advTag').textContent=advSel?N[advSel.rank]:'';
   advBtn.classList.toggle('req',!!advSel&&cur.kind==='Required');
   advMenu.querySelectorAll('[role=option]').forEach(o=>o.setAttribute('aria-selected',!!advSel&&o.id==='adv-'+advSel.rank+'-'+advSel.theme+'-'+advSel.k));

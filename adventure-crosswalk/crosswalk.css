@@ -125,7 +125,7 @@ footer a{color:inherit}
 .picker{position:relative;flex:1;max-width:460px}
 .picker button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font:inherit;font-size:16px;font-weight:700;text-align:left;color:var(--ink);background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:8px 12px;cursor:pointer}
 .picker button.req{background:var(--req-bg);color:var(--req-ink)}
-.picker button .ph{font-weight:400;color:var(--muted)}
+.picker button .blank{font-weight:400;color:var(--muted)}
 .picker button .chev{margin-left:auto;font-size:14px}
 .tag{font-size:12px;font-weight:400;opacity:.8;white-space:nowrap}
 .plist{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;margin:0;padding:6px;list-style:none;display:block;max-height:min(70vh,520px);overflow-y:auto;background:var(--panel);color:var(--ink);border:2px solid var(--strap);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
